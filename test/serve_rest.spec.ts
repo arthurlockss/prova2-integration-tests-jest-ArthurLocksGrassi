@@ -248,5 +248,9 @@ describe('ServeRest API', () => {
     });
   });
 
+  afterEach(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  });
+
   afterAll(() => p.reporter.end());
 });
