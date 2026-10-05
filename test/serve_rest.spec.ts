@@ -40,9 +40,6 @@ describe('ServeRest API', () => {
       .withHeaders('monitor', false)
       .expectStatus(StatusCodes.OK)
       .returns('email');
-  });
-
-  beforeEach(async () => {
     token = await p
       .spec()
       .post(`${baseUrl}/login`)
@@ -249,7 +246,7 @@ describe('ServeRest API', () => {
   });
 
   afterEach(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   });
 
   afterAll(() => p.reporter.end());
