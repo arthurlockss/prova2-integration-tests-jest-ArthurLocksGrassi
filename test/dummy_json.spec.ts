@@ -38,7 +38,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
       });
 
       expect(response.statusCode).toEqual(StatusCodes.OK);
-      expect(response.body).toContain(updatedTitle);
+      expect(response.json.title).toEqual(updatedTitle);
     });
   });
 
@@ -70,7 +70,9 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
       const response = await p.spec().get(`${baseUrl}/products/999999`);
 
       expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
-      expect(response.body).toContain("Product with id '999999' not found");
+      expect(response.json.message).toEqual(
+        "Product with id '999999' not found",
+      );
     });
   });
 });
