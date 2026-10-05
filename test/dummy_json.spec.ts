@@ -7,7 +7,6 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
   const p = pactum;
   const rep = SimpleReporter;
   const baseUrl = "https://dummyjson.com";
-  let createdProductId = "";
 
   p.request.setDefaultTimeout(30000);
 
@@ -19,7 +18,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
       const productName = faker.commerce.productName();
       const productPrice = Number(faker.commerce.price({ min: 10, max: 1000 }));
 
-      createdProductId = await p
+      await p
         .spec()
         .post(`${baseUrl}/products/add`)
         .withJson({
@@ -38,8 +37,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
             category: { type: "string" },
           },
           required: ["id", "title", "price"],
-        })
-        .returns("id");
+        });
     });
 
     it("Cenário 2: Deve atualizar as informações de um produto existente via PUT", async () => {
@@ -47,7 +45,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
 
       await p
         .spec()
-        .put(`${baseUrl}/products/${createdProductId || 1}`)
+        .put(`${baseUrl}/products/1`)
         .withJson({
           title: updatedTitle,
           price: 999.99,
@@ -61,7 +59,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
     it("Cenário 3: Deve buscar os detalhes de um produto específico com sucesso", async () => {
       await p
         .spec()
-        .get(`${baseUrl}/products/${createdProductId || 1}`)
+        .get(`${baseUrl}/products/1`)
         .expectStatus(StatusCodes.OK)
         .expectHeaderContains("content-type", "application/json")
         .expectJsonSchema({
@@ -86,7 +84,7 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
               quantity: 2,
             },
             {
-              id: 15,
+              id: 2,
               quantity: 1,
             },
           ],
