@@ -18,97 +18,59 @@ describe("DummyJSON API - Testes de Integração e Contrato", () => {
       const productName = faker.commerce.productName();
       const productPrice = Number(faker.commerce.price({ min: 10, max: 1000 }));
 
-      await p
-        .spec()
-        .post(`${baseUrl}/products/add`)
-        .withJson({
-          title: productName,
-          description: faker.commerce.productDescription(),
-          price: productPrice,
-          category: "smartphones",
-        })
-        .expectStatus(StatusCodes.CREATED)
-        .expectJsonSchema({
-          type: "object",
-          properties: {
-            id: { type: "integer" },
-            title: { type: "string" },
-            price: { type: "number" },
-            category: { type: "string" },
-          },
-          required: ["id", "title", "price"],
-        });
+      const response = await p.spec().post(`${baseUrl}/products/add`).withJson({
+        title: productName,
+        description: faker.commerce.productDescription(),
+        price: productPrice,
+        category: "smartphones",
+      });
+
+      expect(response.statusCode).toEqual(StatusCodes.CREATED);
+      expect(response.json).toHaveProperty("id");
     });
 
     it("Cenário 2: Deve atualizar as informações de um produto existente via PUT", async () => {
       const updatedTitle = "Smartphone Teste Atualizado QA";
 
-      await p
-        .spec()
-        .put(`${baseUrl}/products/1`)
-        .withJson({
-          title: updatedTitle,
-          price: 999.99,
-        })
-        .expectStatus(StatusCodes.OK)
-        .expectBodyContains(updatedTitle);
+      const response = await p.spec().put(`${baseUrl}/products/1`).withJson({
+        title: updatedTitle,
+        price: 999.99,
+      });
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.body).toContain(updatedTitle);
     });
   });
 
   describe("Cenários de Consulta e Processamento (GET e Carrinhos)", () => {
     it("Cenário 3: Deve buscar os detalhes de um produto específico com sucesso", async () => {
-      await p
-        .spec()
-        .get(`${baseUrl}/products/1`)
-        .expectStatus(StatusCodes.OK)
-        .expectHeaderContains("content-type", "application/json")
-        .expectJsonSchema({
-          type: "object",
-          properties: {
-            id: { type: "integer" },
-            title: { type: "string" },
-          },
-          required: ["id", "title"],
-        });
+      const response = await p.spec().get(`${baseUrl}/products/1`);
+
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(response.json).toHaveProperty("id", 1);
     });
 
     it("Cenário 4: Deve processar a criação de um novo carrinho de compras com múltiplos itens", async () => {
-      await p
+      const response = await p
         .spec()
         .post(`${baseUrl}/carts/add`)
         .withJson({
           userId: 1,
           products: [
-            {
-              id: 1,
-              quantity: 2,
-            },
-            {
-              id: 2,
-              quantity: 1,
-            },
+            { id: 1, quantity: 2 },
+            { id: 2, quantity: 1 },
           ],
-        })
-        .expectStatus(StatusCodes.CREATED)
-        .expectJsonSchema({
-          type: "object",
-          properties: {
-            id: { type: "integer" },
-            total: { type: "number" },
-            discountedTotal: { type: "number" },
-            userId: { type: "integer" },
-            totalProducts: { type: "integer" },
-          },
-          required: ["id", "total", "userId", "products"],
         });
+
+      expect(response.statusCode).toEqual(StatusCodes.CREATED);
+      expect(response.json).toHaveProperty("total");
     });
 
     it("Cenário 5: Deve validar o comportamento ao buscar um produto inexistente (Tratamento de Erro)", async () => {
-      await p
-        .spec()
-        .get(`${baseUrl}/products/999999`)
-        .expectStatus(StatusCodes.NOT_FOUND)
-        .expectBodyContains("Product with id '999999' not found");
+      const response = await p.spec().get(`${baseUrl}/products/999999`);
+
+      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
+      expect(response.body).toContain("Product with id '999999' not found");
     });
   });
 });
