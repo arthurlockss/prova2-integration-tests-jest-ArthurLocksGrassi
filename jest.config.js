@@ -1,7 +1,7 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  testMatch: ["**/test/**/*.|[jt]s?(x)"],
+  testMatch: ["**/test/**/*.spec.ts", "**/test/**/*.test.ts"],
   verbose: true,
   testTimeout: 30000,
   collectCoverage: true, // <-- Adicionar
